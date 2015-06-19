@@ -2,9 +2,10 @@ package tictactoe;
 
 import java.io.File;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.Timer;
+import java.util.TimerTask;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -31,7 +32,7 @@ public class TicTacToe extends Application {
     private boolean isWon = false;
     //menu bar
     private final Menu menu = new Menu("Options");
-    private  Menu turnText = new Menu("Player's Turn");
+    private Menu turnText = new Menu("Player's Turn");
     private MenuBar menuBar = new MenuBar();
 
     @Override
@@ -65,27 +66,35 @@ public class TicTacToe extends Application {
 
     public void processComputerTurn() {
         System.out.println("Is my turn");
-        try {  
-            Thread.sleep(4000);
-        boolean pick = false;
-        while (!pick&&!isWon) {
-            Random r = new Random();
-            int pickOne = r.nextInt(3);
-            int pickTwo = r.nextInt(3);
-            if (box[pickOne][pickTwo].isEmpty()) {
-                box[pickOne][pickTwo].setName(0);
-                box[pickOne][pickTwo].setIsEmpty(false);
-                pick = true;
-                box[pickOne][pickTwo].setStyle("-fx-border-color: red");
-                isComputerTurn = false;
-                isPlayerTurn = true;
-                turnText.setText("Player's turn");
-                checkIfWon(0);
+        Timer timer = new java.util.Timer();
+        timer.schedule(new TimerTask() {
+
+            @Override
+            public void run() {
+                Platform.runLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean pick = false;
+                        while (!pick && !isWon) {
+                            Random r = new Random();
+                            int pickOne = r.nextInt(3);
+                            int pickTwo = r.nextInt(3);
+                            if (box[pickOne][pickTwo].isEmpty()) {
+                                box[pickOne][pickTwo].setName(0);
+                                box[pickOne][pickTwo].setIsEmpty(false);
+                                pick = true;
+                                box[pickOne][pickTwo].setStyle("-fx-border-color: red");
+                                isComputerTurn = false;
+                                isPlayerTurn = true;
+                                turnText.setText("Player's turn");
+                                checkIfWon(0);
+                            }
+                        }
+                    }
+                });
             }
-        }
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TicTacToe.class.getName()).log(Level.SEVERE, null, ex);
-        }        
+        }, 2000);
+
         System.out.println("Out");
     }
 
